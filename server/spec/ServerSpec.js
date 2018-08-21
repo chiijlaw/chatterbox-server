@@ -115,5 +115,15 @@ describe('Node Server Request Listener Function', function() {
         expect(res._responseCode).to.equal(404);
       });
   });
+  
+  it('Should accept "OPTIONS" request', function() {
+    req = new stubs.request('/classes/messages', 'OPTIONS');
+    res = new stubs.response();
+     
+    handler.requestHandler(req, res);
+    
+    expect(res._responseCode).to.equal(202);
+    
+  });
 
 });

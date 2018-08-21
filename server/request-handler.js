@@ -46,7 +46,7 @@ var requestHandler = function(request, response) {
   //
   // You will need to change this if you are sending something
   // other than plain text, like JSON or HTML.
-  headers['Content-Type'] = 'JSON';
+  headers['Content-Type'] = 'application/json';
   
   var routes = {
     '/classes/messages': true
@@ -60,31 +60,35 @@ var requestHandler = function(request, response) {
   var data = {
     results: messages
   };
-  console.log('-----route----', route);
+  
   if (!route) {
     statusCode = 404;
     response.writeHead(statusCode, headers);
     response.end(JSON.stringify('Not Found'));
   } else {
     
-    
-    if (request.method === 'GET' || request.method === 'OPTIONS') {
+    if (request.method === 'GET') {
       response.writeHead(statusCode, headers);
-      console.log('---------data-------', data);
       response.end(JSON.stringify(data));
     }
+    
+    if (request.method === 'OPTIONS') {
+      statusCode = 202;
+      response.writeHead(statusCode, headers);
+      response.end(JSON.stringify(data));
+    }
+    
     if (request.method === 'POST' ) {
       statusCode = 201;
-      // console.log('-----------', request);
       let body = [];
       request.on('data', chunk => {
         body.push(chunk);
       });
+      
       request.on('end', () => {
         body = Buffer.concat(body).toString();
         messages.push(JSON.parse(body));
         response.writeHead(statusCode, headers);
-        console.log('-----------', response);
         response.end(JSON.stringify(data));
       });
       // response.writeHead(statusCode, headers);
@@ -93,7 +97,7 @@ var requestHandler = function(request, response) {
 
     // .writeHead() writes to the request line and headers of the response,
     // which includes the status and all headers.
-    response.writeHead(statusCode, headers);
+    // response.writeHead(statusCode, headers);
 
     // Make sure to always call response.end() - Node may not send
     // anything back to the client until you do. The string you pass to
